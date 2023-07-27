@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"os"
 	"os/signal"
 	"syscall"
@@ -10,10 +9,8 @@ import (
 )
 
 func main() {
-	ctx := context.Background()
-
 	n := node.NewNode()
-	if err := n.Start(ctx, 0); err != nil {
+	if err := n.Start(0); err != nil {
 		panic(err)
 	}
 	defer func() {

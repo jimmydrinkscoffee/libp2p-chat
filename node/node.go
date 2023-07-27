@@ -1,16 +1,18 @@
 package node
 
 import (
-	"context"
+	"fmt"
 
 	"github.com/jimmyvo0512/go-libp2p-tutorial/util"
+	"github.com/libp2p/go-libp2p"
+	"github.com/libp2p/go-libp2p/core/crypto"
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/peer"
 )
 
 type Node interface {
 	GetID() peer.ID
-	Start(ctx context.Context, port uint16) error
+	Start(port uint16) error
 	Shutdown() error
 }
 
@@ -34,7 +36,24 @@ func (n *node) GetID() peer.ID {
 	return n.host.ID()
 }
 
-func (n *node) Start(ctx context.Context, port uint16) error {
+func (n *node) Start(port uint16) error {
+	addr := fmt.Sprintf("/ip4/0.0.0.0/tcp/%d", port)
+
+	privKey, _, err := crypto.GenerateEd25519Key(nil)
+	if err != nil {
+		return err
+	}
+
+	host, err := libp2p.New(
+		libp2p.ListenAddrStrings(addr),
+		libp2p.Identity(privKey),
+	)
+	if err != nil {
+		return err
+	}
+
+	n.host = host
+
 	return nil
 }
 
