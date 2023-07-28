@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/jimmyvo0512/go-libp2p-tutorial/node/chat"
 	"github.com/jimmyvo0512/go-libp2p-tutorial/util"
 	"github.com/libp2p/go-libp2p"
 	dht "github.com/libp2p/go-libp2p-kad-dht"
+	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	"github.com/libp2p/go-libp2p/core/crypto"
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/peer"
@@ -20,14 +22,16 @@ const protocolPrefix = "/chat"
 
 type Node interface {
 	GetID() peer.ID
-	Start(uint16) error
+	Start(context.Context, uint16) error
 	Bootstrap(context.Context, []multiaddr.Multiaddr) error
 	Shutdown() error
 }
 
 type node struct {
-	host host.Host
-	kDht *dht.IpfsDHT
+	host    host.Host
+	kDht    *dht.IpfsDHT
+	ps      *pubsub.PubSub
+	chatMgr chat.Manager
 }
 
 var _ Node = (*node)(nil)
@@ -46,23 +50,14 @@ func (n *node) GetID() peer.ID {
 	return n.host.ID()
 }
 
-func (n *node) Start(port uint16) error {
-	addr := fmt.Sprintf("/ip4/0.0.0.0/tcp/%d", port)
-
-	privKey, _, err := crypto.GenerateEd25519Key(nil)
-	if err != nil {
+func (n *node) Start(ctx context.Context, port uint16) error {
+	if err := n.initHost(port); err != nil {
 		return err
 	}
 
-	host, err := libp2p.New(
-		libp2p.ListenAddrStrings(addr),
-		libp2p.Identity(privKey),
-	)
-	if err != nil {
+	if err := n.initPubSub(ctx); err != nil {
 		return err
 	}
-
-	n.host = host
 
 	return nil
 }
@@ -120,5 +115,39 @@ func (n *node) Shutdown() error {
 		return err
 	}
 
+	return nil
+}
+
+func (n *node) initHost(port uint16) error {
+	addr := fmt.Sprintf("/ip4/0.0.0.0/tcp/%d", port)
+
+	privKey, _, err := crypto.GenerateEd25519Key(nil)
+	if err != nil {
+		return err
+	}
+
+	host, err := libp2p.New(
+		libp2p.ListenAddrStrings(addr),
+		libp2p.Identity(privKey),
+	)
+	if err != nil {
+		return err
+	}
+
+	n.host = host
+	return nil
+}
+
+func (n *node) initPubSub(ctx context.Context) error {
+	ps, err := pubsub.NewGossipSub(
+		ctx,
+		n.host,
+		pubsub.WithMessageSignaturePolicy(pubsub.StrictSign),
+	)
+	if err != nil {
+		return err
+	}
+
+	n.ps = ps
 	return nil
 }

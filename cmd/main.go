@@ -20,7 +20,7 @@ func main() {
 
 	// Initialize node
 	n := node.NewNode()
-	if err := n.Start(cfg.NodePort); err != nil {
+	if err := n.Start(ctx, cfg.NodePort); err != nil {
 		panic(err)
 	}
 	defer func() {
