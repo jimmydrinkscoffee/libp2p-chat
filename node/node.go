@@ -14,6 +14,7 @@ import (
 	discRt "github.com/libp2p/go-libp2p/p2p/discovery/routing"
 	discUtil "github.com/libp2p/go-libp2p/p2p/discovery/util"
 	"github.com/multiformats/go-multiaddr"
+	"github.com/vbph/libp2p-chat/dtos"
 	"github.com/vbph/libp2p-chat/node/chat"
 	"github.com/vbph/libp2p-chat/util"
 )
@@ -25,6 +26,9 @@ type Node interface {
 	Start(context.Context, uint16) error
 	Bootstrap(context.Context, []multiaddr.Multiaddr) error
 	Shutdown() error
+
+	JoinRoom(context.Context, string, string) error
+	SendMessage(context.Context, string, string) error
 }
 
 type node struct {
@@ -107,7 +111,7 @@ func (n *node) Bootstrap(ctx context.Context, addrs []multiaddr.Multiaddr) error
 		}
 	}()
 
-	chatMgr := chat.NewManager()
+	chatMgr, _ := chat.NewManager(n.GetID(), n.ps, n.kDht)
 	n.chatMgr = chatMgr
 
 	return nil
@@ -115,6 +119,28 @@ func (n *node) Bootstrap(ctx context.Context, addrs []multiaddr.Multiaddr) error
 
 func (n *node) Shutdown() error {
 	if err := n.host.Close(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (n *node) JoinRoom(ctx context.Context, roomID, nickname string) error {
+	if err := n.chatMgr.JoinRoom(roomID, nickname); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (n *node) SendMessage(ctx context.Context, roomID, message string) error {
+	msg := dtos.Message{
+		SenderID: n.GetID(),
+		SentAt:   time.Now(),
+		Content:  message,
+	}
+
+	if err := n.chatMgr.SendMessage(roomID, msg); err != nil {
 		return err
 	}
 
