@@ -7,11 +7,12 @@ import (
 
 	"github.com/jimmyvo0512/go-libp2p-tutorial/util"
 	"github.com/libp2p/go-libp2p"
-	disc "github.com/libp2p/go-libp2p-discovery"
 	dht "github.com/libp2p/go-libp2p-kad-dht"
 	"github.com/libp2p/go-libp2p/core/crypto"
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/peer"
+	discRt "github.com/libp2p/go-libp2p/p2p/discovery/routing"
+	discUtil "github.com/libp2p/go-libp2p/p2p/discovery/util"
 	"github.com/multiformats/go-multiaddr"
 )
 
@@ -90,8 +91,8 @@ func (n *node) Bootstrap(ctx context.Context, addrs []multiaddr.Multiaddr) error
 
 	n.kDht = kDht
 
-	rt := disc.NewRoutingDiscovery(n.kDht)
-	disc.Advertise(ctx, rt, protocolPrefix)
+	rt := discRt.NewRoutingDiscovery(n.kDht)
+	discUtil.Advertise(ctx, rt, protocolPrefix)
 
 	go func() {
 		tick := time.NewTicker(time.Second * 5)
