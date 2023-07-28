@@ -107,6 +107,9 @@ func (n *node) Bootstrap(ctx context.Context, addrs []multiaddr.Multiaddr) error
 		}
 	}()
 
+	chatMgr := chat.NewManager()
+	n.chatMgr = chatMgr
+
 	return nil
 }
 
