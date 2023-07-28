@@ -3,7 +3,7 @@ package events
 import (
 	"errors"
 
-	"github.com/jimmyvo0512/go-libp2p-tutorial/util"
+	"github.com/vbph/libp2p-chat/util"
 )
 
 type Subscriber interface {

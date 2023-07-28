@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/jimmyvo0512/go-libp2p-tutorial/node/chat"
-	"github.com/jimmyvo0512/go-libp2p-tutorial/util"
 	"github.com/libp2p/go-libp2p"
 	dht "github.com/libp2p/go-libp2p-kad-dht"
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
@@ -16,6 +14,8 @@ import (
 	discRt "github.com/libp2p/go-libp2p/p2p/discovery/routing"
 	discUtil "github.com/libp2p/go-libp2p/p2p/discovery/util"
 	"github.com/multiformats/go-multiaddr"
+	"github.com/vbph/libp2p-chat/node/chat"
+	"github.com/vbph/libp2p-chat/util"
 )
 
 const protocolPrefix = "/chat"

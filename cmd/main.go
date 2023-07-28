@@ -6,7 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/jimmyvo0512/go-libp2p-tutorial/node"
+	"github.com/vbph/libp2p-chat/node"
 )
 
 func main() {

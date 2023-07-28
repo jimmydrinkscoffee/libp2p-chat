@@ -1,4 +1,4 @@
-module github.com/jimmyvo0512/go-libp2p-tutorial
+module github.com/vbph/libp2p-chat
 
 go 1.20
 
