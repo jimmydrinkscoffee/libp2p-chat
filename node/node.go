@@ -68,20 +68,20 @@ func (n *node) Start(port uint16) error {
 }
 
 func (n *node) Bootstrap(ctx context.Context, addrs []multiaddr.Multiaddr) error {
-	var btNodes []peer.AddrInfo
+	var btPeers []peer.AddrInfo
 	for _, addr := range addrs {
 		info, err := peer.AddrInfoFromP2pAddr(addr)
 		if err != nil {
 			return err
 		}
 
-		btNodes = append(btNodes, *info)
+		btPeers = append(btPeers, *info)
 	}
 
 	kDht, err := dht.New(
 		ctx,
 		n.host,
-		dht.BootstrapPeers(btNodes...),
+		dht.BootstrapPeers(btPeers...),
 		dht.ProtocolPrefix(protocolPrefix),
 		dht.Mode(dht.ModeAutoServer),
 	)
